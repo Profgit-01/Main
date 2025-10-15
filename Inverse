@@ -1,0 +1,150 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    double A[10][10], temp[10][10], cofactor[10][10], adj[10][10], inverse[10][10];
+    int n;
+
+    cout << "Enter the order of the matrix: ";
+    cin >> n;
+
+    cout << "Enter the elements of the matrix A:\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> A[i][j];
+
+    // ---------------- DET(A) USING LOOP (GAUSSIAN ELIMINATION) ----------------
+    double det = 1.0;
+    double B[10][10];
+
+    // Copy A to B (because we will modify B)
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            B[i][j] = A[i][j];
+
+    // Convert to upper triangular form
+    for (int i = 0; i < n; i++) {
+        if (fabs(B[i][i]) < 1e-9) {
+            int swapRow = -1;
+            for (int k = i + 1; k < n; k++) {
+                if (fabs(B[k][i]) > 1e-9) {
+                    swapRow = k;
+                    break;
+                }
+            }
+            if (swapRow == -1) {
+                det = 0;
+                break;
+            } else {
+                for (int j = 0; j < n; j++) {
+                    double t = B[i][j];
+                    B[i][j] = B[swapRow][j];
+                    B[swapRow][j] = t;
+                }
+                det = -det; // row swap changes sign
+            }
+        }
+
+        det *= B[i][i];
+
+        if (fabs(B[i][i]) < 1e-9) {
+            det = 0;
+            break;
+        }
+
+        for (int k = i + 1; k < n; k++) {
+            double ratio = B[k][i] / B[i][i];
+            for (int j = i; j < n; j++)
+                B[k][j] -= ratio * B[i][j];
+        }
+    }
+
+    if (fabs(det) < 1e-9) {
+        cout << "\nMatrix is singular, inverse does not exist.\n";
+        return 0;
+    }
+
+    // ---------------- COFACTOR MATRIX ----------------
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            int subi = 0;
+            for (int row = 0; row < n; row++) {
+                if (row == i) continue;
+                int subj = 0;
+                for (int col = 0; col < n; col++) {
+                    if (col == j) continue;
+                    temp[subi][subj] = A[row][col];
+                    subj++;
+                }
+                subi++;
+            }
+
+            // Compute minor determinant using loops (for 2x2 or 3x3 submatrix)
+            double subdet = 0;
+            if (n - 1 == 1) {
+                subdet = temp[0][0];
+            } else if (n - 1 == 2) {
+                subdet = temp[0][0]*temp[1][1] - temp[0][1]*temp[1][0];
+            } else {
+                double C[10][10];
+                for (int p = 0; p < n - 1; p++)
+                    for (int q = 0; q < n - 1; q++)
+                        C[p][q] = temp[p][q];
+                // Upper triangular method again for submatrix determinant
+                double subd = 1.0;
+                for (int p = 0; p < n - 1; p++) {
+                    if (fabs(C[p][p]) < 1e-9) {
+                        int sr = -1;
+                        for (int k = p + 1; k < n - 1; k++)
+                            if (fabs(C[k][p]) > 1e-9) { sr = k; break; }
+                        if (sr == -1) { subd = 0; break; }
+                        for (int c = 0; c < n - 1; c++) {
+                            double t = C[p][c];
+                            C[p][c] = C[sr][c];
+                            C[sr][c] = t;
+                        }
+                        subd = -subd;
+                    }
+                    subd *= C[p][p];
+                    for (int k = p + 1; k < n - 1; k++) {
+                        double ratio = C[k][p] / C[p][p];
+                        for (int c = p; c < n - 1; c++)
+                            C[k][c] -= ratio * C[p][c];
+                    }
+                }
+                subdet = subd;
+            }
+            cofactor[i][j] = pow(-1, i + j) * subdet;
+        }
+    }
+
+    // ---------------- ADJOINT (TRANSPOSE OF COFACTOR) ----------------
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            adj[i][j] = cofactor[j][i];
+
+    // ---------------- INVERSE ----------------
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            inverse[i][j] = adj[i][j] / det;
+
+    // ---------------- OUTPUT ----------------
+    cout << "\nDeterminant = " << det << endl;
+
+    cout << "\nAdjoint Matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++)
+            cout << adj[i][j] << "\t";
+        cout << endl;
+    }
+
+    cout << "\nInverse Matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++)
+            cout << inverse[i][j] << "\t";
+        cout << endl;
+    }
+
+    return 0;
+}
