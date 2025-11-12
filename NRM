@@ -1,0 +1,58 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+// Define the function whose root we want to find
+double f(double x) {
+    return x * x * x - x - 2;  // Example: f(x) = x³ - x - 2
+}
+
+// Define the derivative of the function
+double f_prime(double x) {
+    return 3 * x * x - 1;  // Derivative: f'(x) = 3x² - 1
+}
+
+int main() {
+    double x0, x1, tolerance;
+    int max_iter;
+
+    // Input initial guess, tolerance, and max iterations
+    cout << "Enter initial guess: ";
+    cin >> x0;
+    cout << "Enter tolerance (e.g., 1e-6): ";
+    cin >> tolerance;
+    cout << "Enter maximum number of iterations: ";
+    cin >> max_iter;
+
+    cout << "\nNewton-Raphson Method Iterations:\n";
+    cout << "---------------------------------\n";
+    cout << "Iter\t x\t\t f(x)\n";
+
+    int iter = 0;
+    while (iter < max_iter) {
+        double fx = f(x0);
+        double fpx = f_prime(x0);
+
+        if (fabs(fpx) < 1e-12) {  // Prevent division by zero
+            cout << "Error: derivative is zero. Stopping.\n";
+            break;
+        }
+
+        x1 = x0 - fx / fpx;
+
+        cout << iter + 1 << "\t " << x1 << "\t " << f(x1) << "\n";
+
+        if (fabs(x1 - x0) < tolerance) {
+            cout << "\nRoot found: " << x1 << " after " << iter + 1 << " iterations.\n";
+            return 0;
+        }
+
+        x0 = x1;
+        iter++;
+    }
+
+    cout << "\nMethod did not converge after " << max_iter << " iterations.\n";
+    cout << "Last approximation: " << x1 << "\n";
+
+    return 0;
+}
