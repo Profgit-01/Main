@@ -1,0 +1,35 @@
+#include <iostream>
+using namespace std;
+
+// Function defining dy/dx = f(x, y)
+double f(double x, double y) {
+    return x + y;   // Example: dy/dx = x + y
+}
+
+int main() {
+    double x0, y0, h, xn, n;
+
+    cout << "Enter initial value of x (x0): ";
+    cin >> x0;
+    cout << "Enter initial value of y (y0): ";
+    cin >> y0;
+    cout << "Enter step size (h): ";
+    cin >> h;
+    cout << "Enter the value of x at which you want y (xn): ";
+    cin >> xn;
+
+    cout << "\n--- EULER'S METHOD CALCULATION ---\n";
+    cout << "x\t\ty\n";
+    cout << x0 << "\t" << y0 << endl;
+
+    // Euler iteration
+    while (x0 < xn) {
+        y0 = y0 + h * f(x0, y0);  // Euler formula
+        x0 = x0 + h;
+        cout << x0 << "\t" << y0 << endl;
+    }
+
+    cout << "\nApproximate value of y at x = " << xn << " is " << y0 << endl;
+
+    return 0;
+}
