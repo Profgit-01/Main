@@ -1,0 +1,61 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+// Define the function whose root we want to find
+double f(double x) {
+    return x * x * x - x - 2;  // Example: f(x) = x³ - x - 2
+}
+
+int main() {
+    double x0, x1, x2, f0, f1, f2, tolerance;
+    int max_iter;
+
+    // Input two initial guesses, tolerance, and max iterations
+    cout << "Enter first initial guess (x0): ";
+    cin >> x0;
+    cout << "Enter second initial guess (x1): ";
+    cin >> x1;
+    cout << "Enter tolerance (e.g., 1e-6): ";
+    cin >> tolerance;
+    cout << "Enter maximum number of iterations: ";
+    cin >> max_iter;
+
+    cout << "\nSecant Method Iterations:\n";
+    cout << "---------------------------------\n";
+    cout << "Iter\t x0\t\t x1\t\t x2\t\t f(x2)\n";
+
+    int iter = 0;
+    while (iter < max_iter) {
+        f0 = f(x0);
+        f1 = f(x1);
+
+        // Prevent division by zero
+        if (fabs(f1 - f0) < 1e-12) {
+            cout << "Error: Division by zero (f(x1) - f(x0) too small).\n";
+            return 1;
+        }
+
+        // Secant formula
+        x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+        f2 = f(x2);
+
+        cout << iter + 1 << "\t " << x0 << "\t " << x1 << "\t " << x2 << "\t " << f2 << "\n";
+
+        // Check for convergence
+        if (fabs(x2 - x1) < tolerance) {
+            cout << "\nRoot found: " << x2 << " after " << iter + 1 << " iterations.\n";
+            return 0;
+        }
+
+        // Update points
+        x0 = x1;
+        x1 = x2;
+        iter++;
+    }
+
+    cout << "\nMethod did not converge after " << max_iter << " iterations.\n";
+    cout << "Last approximation: " << x2 << "\n";
+
+    return 0;
+}
