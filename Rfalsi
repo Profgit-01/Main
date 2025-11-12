@@ -1,0 +1,64 @@
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+// Define the function whose root we want to find
+double f(double x) {
+    return x * x * x - x - 2;  // Example: f(x) = x³ - x - 2
+}
+
+int main() {
+    double a, b, c, fa, fb, fc, tolerance;
+    int max_iter;
+
+    // Input interval [a, b], tolerance, and max iterations
+    cout << "Enter the interval [a, b]: ";
+    cin >> a >> b;
+    cout << "Enter tolerance (e.g., 1e-6): ";
+    cin >> tolerance;
+    cout << "Enter maximum number of iterations: ";
+    cin >> max_iter;
+
+    fa = f(a);
+    fb = f(b);
+
+    if (fa * fb > 0) {
+        cout << "Error: f(a) and f(b) must have opposite signs.\n";
+        return 1;
+    }
+
+    cout << "\nRegula Falsi Method Iterations:\n";
+    cout << "---------------------------------\n";
+    cout << "Iter\t a\t\t b\t\t c\t\t f(c)\n";
+
+    int iter = 0;
+    while (iter < max_iter) {
+        // Calculate the point of intersection of the secant line with the x-axis
+        c = (a * fb - b * fa) / (fb - fa);
+        fc = f(c);
+
+        cout << iter + 1 << "\t " << a << "\t " << b << "\t " << c << "\t " << fc << "\n";
+
+        // Check for convergence
+        if (fabs(fc) < tolerance) {
+            cout << "\nRoot found: " << c << " after " << iter + 1 << " iterations.\n";
+            return 0;
+        }
+
+        // Update the interval
+        if (fa * fc < 0) {
+            b = c;
+            fb = fc;
+        } else {
+            a = c;
+            fa = fc;
+        }
+
+        iter++;
+    }
+
+    cout << "\nMethod did not converge after " << max_iter << " iterations.\n";
+    cout << "Last approximation: " << c << "\n";
+
+    return 0;
+}
